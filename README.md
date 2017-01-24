@@ -1,5 +1,5 @@
 # Bell Countdown
-Issues for the bell countdown website
+Source for the bell countdown website
 
 If you are experiencing any issues please report them [here](https://github.com/Noskcaj19/bellcountdown/issues/new)
 
