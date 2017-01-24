@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Countdown to the bell at Jupiter High School">
+	<meta name="keywords" content="Bell, Countdown, App, Jupiter High School, Bell Schedule">
+	<meta name="author" content="Noskcaj">
+    <title>Bell Countdown</title>
+    <link href="/styles/welcome.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div class="box">
+    {% if development %}
+        <h1 class="welcome-title">Bell Countdown - Beta</h1>
+        <p id="beta-warning">
+            This is beta, and so it is likely to have issues.<br>
+            If you find some bugs, let me know <a href="https://github.com/Noskcaj19/bellcountdown/blob/master/README.md">here</a>.<br>
+            If you are not alright with testing a beta site, head over <a href="https://bellcountdown.appspot.com">here</a>.
+        </p>
+    {% else %}
+        <h1 class="welcome-title">Bell Countdown</h1>
+    {% endif %}
+</div>
+
+</body>
+</html>
