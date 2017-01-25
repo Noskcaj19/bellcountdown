@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	{% include "ga.html" %}
     <meta charset="UTF-8">
     <meta name="description" content="Countdown to the bell at Jupiter High School">
 	<meta name="keywords" content="Bell, Countdown, App, Jupiter High School, Bell Schedule">
@@ -14,15 +15,28 @@
 
 <div class="box">
     {% if development %}
-        <h1 class="welcome-title">Bell Countdown - Beta</h1>
-        <p id="beta-warning">
-            This is beta, and so it is likely to have issues.<br>
-            If you find some bugs, let me know <a href="https://github.com/Noskcaj19/bellcountdown/blob/master/README.md">here</a>.<br>
-            If you just want a stable site head over <a href="https://bellcountdown.appspot.com">here</a>.
-        </p>
+        <div class="welcome-box">
+            <h1 id="welcome-title" class="title">Bell Countdown - Beta</h1>
+
+            <div id="beta-warning-container">
+                <p id="beta-warning">
+                    This is beta, and so it is likely to have issues.<br>
+                    If you find some bugs, let me know <a href="https://github.com/Noskcaj19/bellcountdown/blob/master/README.md">here</a>.<br>
+                    If you just want a stable site head over <a href="https://bellcountdown.appspot.com">here</a>.
+                </p>
+            </div>
+        </div>
     {% else %}
-        <h1 class="welcome-title">Bell Countdown</h1>
+        <h1 id="welcome-title" class="title">Bell Countdown</h1>
     {% endif %}
+
+    <div id="schedule-links">
+        <p id="question">Which lunch do you have?</p>
+                <p id="temp-notice">These schedules will be removed soon</p>
+
+        <a href="/schedule/a">Lunch A</a>
+        <a href="/schedule/b">Lunch B</a>
+    </div>
 </div>
 
 </body>

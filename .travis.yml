@@ -1,4 +1,37 @@
+# Use Dockerized infrastructure
+sudo: false
 language: python
-python:
-- '2.7'
-- pypy
+
+# Cache our Gcloud SDK between commands
+cache:
+  directories:
+  - "/home/travis/google-cloud-sdk/"
+
+deploy:
+  provider: gae
+  # Skip cleanup so api_key.py and vendored dependencies are still there
+  skip_cleanup: true
+  keyfile: client-secret.json
+  project: bellcountdown
+  version: beta
+  no_promote: true
+  no_stop_previous_version: true
+  default: true
+  on:
+    all_branches: true
+
+before_install:
+# Decrypt the credentials we added to the repo using the key we added with the Travis command line tool
+- openssl aes-256-cbc -K $encrypted_fa11e4845704_key -iv $encrypted_fa11e4845704_iv -in credentials.tar.gz.enc -out credentials.tar.gz -d
+- tar -xzf credentials.tar.gz
+- mkdir -p lib
+
+install:
+# Install the Python dependencies
+- pip install -r requirements.txt -t lib/
+
+script:
+# Run the unit tests
+# - python test_main.py
+- echo "No Script to run"
+
