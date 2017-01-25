@@ -3,4 +3,5 @@
 client-secret.json
 api_key.py
 credentials.tar.gz
+/lib
 *.pyc

@@ -54,12 +54,12 @@ p#beta-warning {
     margin-bottom: 0;
 }
 
-a:link, a:visited {
+div#schedule-links > a:link, div#schedule-links > a:visited {
 	color: black;
 	text-decoration: none;
 }
 
-a:hover {
+div#schedule-links > a:hover {
 	text-decoration: underline;
 }
 
