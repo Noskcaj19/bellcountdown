@@ -1,0 +1,41 @@
+html, body, .time-wrapper {
+	margin: 0;
+	height: 100%;
+}
+
+#time-wrapper {
+	height: 100%;
+	display: -webkit-flexbox;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-align: center;
+	-ms-flex-align: center;
+	-webkit-align-items: center;
+	align-items: center;
+	justify-content: center;
+}
+
+#time-wrapper > #time {
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 40vw;
+	margin: 0;
+	font-family: "San Francisco Ultralight", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: black;
+}
+
+#second-offset {
+	position: absolute;
+    left: 1em;
+    top: 1em;
+    padding: 0;
+    margin: 0;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 1.3em;
+}
+
+@font-face {
+	font-family: San Francisco Ultralight;
+	src: url('/fonts/San Francisco Ultralight.ttf');
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- TODO: Determine if ga is causing delay on startup -->
+    <!--{% include "ga.html" %} -->
+    <meta charset="UTF-8">
+    <title>Schedule - {{ type.capitalize() }}</title>
+    <link rel="stylesheet" href="/styles/schedules/static-schedule.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="Countdown">
+	<meta name="format-detection" content="telephone=no">
+	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
+    <script type="text/javascript">
+        period = null;
+        bellSeconds = 0;
+		bellTimes = null;
+
+        function MillisecondsToTime(duration) {
+            var seconds = parseInt((duration/1000)%60);
+            var minutes = parseInt((duration/(1000*60))%60);
+            var hours = parseInt((duration/(1000*60*60))%24);
+
+            hours = (hours == 0) ? "" : hours + ":";
+            seconds = (seconds < 10) ? "0" + seconds : seconds;
+            return hours + minutes + ":" + seconds;
+        }
+
+        function setBellSeconds(newTime) {
+            bellSeconds = parseInt(newTime)
+            offset_element.innerText = bellSeconds
+            setupBellTimes()
+        }
+
+		function setupBellTimes() {
+            console.log("Makeing times table with %s", bellSeconds)
+			bellTimes = [
+				new Date().setHours(7, 21, bellSeconds), //start of school, first bell
+				new Date().setHours(8, 30, bellSeconds), //end of first
+				new Date().setHours(9, 26, bellSeconds), //end of second
+				new Date().setHours(10, 22, bellSeconds), //end of third
+				new Date().setHours(11, 18, bellSeconds), //end of fourth
+				{% if schedule_type == "a" %}
+				new Date().setHours(11, 49, bellSeconds), //end of lunch
+				{% elif schedule_type == "b" %}
+				new Date().setHours(12, 14, bellSeconds), //end of fifth
+				{% endif %}
+				new Date().setHours(12, 45, bellSeconds), //end of fifth
+				new Date().setHours(13, 41, bellSeconds), //end of sixth
+				new Date().setHours(20, 37, bellSeconds)  //end of school
+			]
+		}
+
+		function currentPeriods(now) {
+            if (!bellTimes) { setupBellTimes() }
+            if (now < bellTimes[0] || now > bellTimes[bellTimes.length-1]) {
+                return null;
+            }
+            for (i = 0; i < bellTimes.length; i++) {
+                if (now >= bellTimes[i] && now <= bellTimes[i + 1]) {
+                    return i + 1
+                }
+            }
+            return null;
+        }
+
+        function mainClock() {
+            var time_now = Date.now();
+            var period = currentPeriods(time_now);
+            var isWeekend = new Date().getDay()%6==0;
+            if (period != null && !isWeekend) {
+                time_element.innerHTML = MillisecondsToTime(bellTimes[period] - time_now)
+                setTimeout(mainClock, 125)
+            } else {
+                time_element.innerHTML = "0:00";
+                setTimeout(mainClock, 10000)
+            }
+        }
+
+        function loadSavedTime() {
+            try {
+                var savedSeconds = localStorage.getItem("savedSeconds")
+                console.log("Accessed localStorage. Using saved seconds")
+                setBellSeconds(savedSeconds)
+            } catch (error) {
+                console.warn("Could not access localStorage. Is private browsing enabled?");
+            }
+        }
+
+        function connectionFail() {
+            console.warn("Fetching seconds failed. Fetching storage.")
+            try {
+                var savedSeconds = localStorage.getItem("savedSeconds")
+                console.log("Accessed storage. Using saved seconds")
+                setBellSeconds(savedSeconds)
+            } catch (error) {
+                console.warn("Could not access localStorage. Is private browsing enabled?");
+            }
+        }
+        function getAsyncTime() {
+            var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					setBellSeconds(this.responseText)
+					console.log('Api connection success')
+					try {
+						localStorage.setItem("savedSeconds", bellSeconds)
+					} catch (error) {
+						console.warn("Could not save seconds to localStorage. Is private browsing enabled?");
+					}
+				} else if (this.readyState == 4 && this.status != 200) {
+					connectionFail()
+				}
+			};
+
+            xhttp.timeout = 5000
+			xhttp.ontimeout = function (e) {
+			    connectionFail()
+			};
+
+			xhttp.open("GET", "/api/seconds", true);
+			xhttp.send();
+        }
+
+        function initialize() {
+            time_element = document.getElementById("time");
+            offset_element = document.getElementById("second-offset")
+            mainClock();
+            // LocalStorage
+            loadSavedTime();
+            // Server
+            //getAsyncTime()
+             /*time_element.style['fontSize'] = "40em"
+            resize()*/
+        }
+
+        // Having critical issues
+        /*function resize() {
+            var bounds = time_element.getBoundingClientRect()
+            function singleBound() {
+                bounds = time_element.getBoundingClientRect()
+                if (bounds['left'] < 0) {
+                    var fontSizeStr = time_element.style.fontSize
+                    var fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2))
+                    time_element.style.fontSize = (fontSizeInt - 1) + "em;"
+                    singleBound()
+                }
+            }
+            singleBound()
+        } */
+
+
+    </script>
+</head>
+<body onload="initialize()">
+    <p id="second-offset"></p>
+	<section id="time-wrapper">
+		<p id="time">••••</p>
+	</section>
+</body>
+</html>

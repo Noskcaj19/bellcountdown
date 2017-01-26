@@ -1,0 +1,9 @@
+CACHE MANIFEST
+# Cache manifest version 0.0.7
+/styles/schedules/static-schedule.css
+/fonts/San%20Francisco%20Ultralight.ttf
+
+NETWORK:
+/api/seconds
+https://www.google-analytics.com/collect
+https://www.google-analytics.com/analytics.js
