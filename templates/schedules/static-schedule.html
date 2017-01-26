@@ -4,7 +4,7 @@
     <!-- TODO: Determine if ga is causing delay on startup -->
     <!--{% include "ga.html" %} -->
     <meta charset="UTF-8">
-    <title>Schedule - {{ type.capitalize() }}</title>
+    <title>Schedule - {{ schedule_type.capitalize() }}</title>
     <link rel="stylesheet" href="/styles/schedules/static-schedule.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -50,7 +50,7 @@
 				{% endif %}
 				new Date().setHours(12, 45, bellSeconds), //end of fifth
 				new Date().setHours(13, 41, bellSeconds), //end of sixth
-				new Date().setHours(20, 37, bellSeconds)  //end of school
+				new Date().setHours(14, 37, bellSeconds)  //end of school
 			]
 		}
 

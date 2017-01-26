@@ -17,9 +17,8 @@ def welcome_page():
     return render_template("welcome.html", development=development())
 
 
-# TODO: Remove these
-@app.route('/schedule/', defaults=None)
-@app.route('/schedule/<string:type>', defaults=None)
+@app.route('/schedule/')
+@app.route('/schedule/<string:type>')
 def temp_schedule(type=None):
     if type == None:
         flash("No schedule selected, please use one of the links.")
@@ -27,7 +26,7 @@ def temp_schedule(type=None):
     elif type not in ["a", "b"]:
         flash("Invald schedule selected, please use one of the links.")
         return redirect("/")
-    return render_template("schedules/static-schedule.html", type=type)
+    return render_template("schedules/static-schedule.html", schedule_type=type)
 
 @app.route('/api/seconds/')
 def server_second_offset():
