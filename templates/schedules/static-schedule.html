@@ -28,12 +28,15 @@
 
         function setBellSeconds(newTime) {
             bellSeconds = parseInt(newTime)
+            if (isNaN(bellSeconds)) {
+               bellSeconds = 0.0
+            }
             offset_element.innerText = bellSeconds
             setupBellTimes()
         }
 
 		function setupBellTimes() {
-            console.log("Makeing times table with %s", bellSeconds)
+            console.log("Making times table with %s", bellSeconds)
 			bellTimes = [
 				new Date().setHours(7, 21, bellSeconds), //start of school, first bell
 				new Date().setHours(8, 30, bellSeconds), //end of first
