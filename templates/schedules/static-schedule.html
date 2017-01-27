@@ -201,6 +201,12 @@
             hideIndicator()
         }
 
+        function firstCacheComplete() {
+            stopIndicatorSpining();
+            indicator.innerText = "";
+            hideIndicator()
+        }
+
         function cacheErrorListener(event) {
             console.error("Cache error occured");
             stopIndicatorSpining();
@@ -211,6 +217,7 @@
         cache.addEventListener('checking', checkingForCache, false);
         cache.addEventListener('updateready', cacheUpdateReadyListener, false);
         cache.addEventListener('noupdate', noUpdate, false);
+        cache.addEventListener('cached', firstCacheComplete, false);
         cache.addEventListener('error', cacheErrorListener, false);
     </script>
 </head>
