@@ -16,7 +16,7 @@ div#schedule-links {
 }
 
 div#schedule-links p#question {
-    margin-bottom: 0;
+    margin-bottom: 1.5em;
 }
 
 div#schedule-links p#temp-notice {
