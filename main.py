@@ -1,6 +1,6 @@
 import os
 import ndb_utils
-from flask import Flask, render_template, redirect, flash
+from flask import Flask, render_template, redirect, request, flash
 app = Flask(__name__)
 app.secret_key = '9625403974088191.8326510132286338'
 
@@ -31,6 +31,25 @@ def temp_schedule(type=None):
 @app.route('/api/seconds/')
 def server_second_offset():
     return str(ndb_utils.getSecondOffset())
+
+@app.route('/api/setSeconds/', methods=["POST"])
+def set_server_second_offset():
+    new_seconds = request.form.get("newSeconds", "")
+    credentials = request.form.get("credentials", None)
+
+    if new_seconds == "":
+        return "Missing form field", 400
+
+    path = os.path.join(os.path.split(__file__)[0], 'auth-credentials.passwd')
+    with open(path) as auth_file:
+        correct_passwd = auth_file.read()
+    if credentials == None:
+        return "No Credentials", 401
+    if credentials != correct_passwd:
+        return "Unauthorized", 403
+
+    ndb_utils.set_second_offset(float(new_seconds))
+    return "Success", 200
 
 if __name__ == '__main__':
     app.run()
