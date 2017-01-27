@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html manifest="/mobile-cache.manifest" lang="en">
 <head>
     <!-- TODO: Determine if ga is causing delay on startup -->
     <!--{% include "ga.html" %} -->
@@ -12,9 +12,11 @@
 	<meta name="format-detection" content="telephone=no">
 	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
     <script type="text/javascript">
-        period = null;
-        bellSeconds = 0;
-		bellTimes = null;
+        var bellSeconds = 0;
+        var period
+		var bellTimes
+        var indicator;
+        var cacheMeter;
 
         function MillisecondsToTime(duration) {
             var seconds = parseInt((duration/1000)%60);
@@ -27,16 +29,16 @@
         }
 
         function setBellSeconds(newTime) {
-            bellSeconds = parseInt(newTime)
+            bellSeconds = parseInt(newTime);
             if (isNaN(bellSeconds)) {
-               bellSeconds = 0.0
+               bellSeconds = 0.0;
             }
-            offset_element.innerText = bellSeconds
-            setupBellTimes()
+            offset_element.innerText = bellSeconds;
+            setupBellTimes();
         }
 
 		function setupBellTimes() {
-            console.log("Making times table with %s", bellSeconds)
+            console.log("Making times table with %s", bellSeconds);
 			bellTimes = [
 				new Date().setHours(7, 21, bellSeconds), //start of school, first bell
 				new Date().setHours(8, 30, bellSeconds), //end of first
@@ -55,13 +57,13 @@
 		}
 
 		function currentPeriods(now) {
-            if (!bellTimes) { setupBellTimes() }
+            if (!bellTimes) { setupBellTimes(); }
             if (now < bellTimes[0] || now > bellTimes[bellTimes.length-1]) {
                 return null;
             }
             for (i = 0; i < bellTimes.length; i++) {
                 if (now >= bellTimes[i] && now <= bellTimes[i + 1]) {
-                    return i + 1
+                    return i + 1;
                 }
             }
             return null;
@@ -72,30 +74,30 @@
             var period = currentPeriods(time_now);
             var isWeekend = new Date().getDay()%6==0;
             if (period != null && !isWeekend) {
-                time_element.innerHTML = MillisecondsToTime(bellTimes[period] - time_now)
-                setTimeout(mainClock, 125)
+                time_element.innerHTML = MillisecondsToTime(bellTimes[period] - time_now);
+                setTimeout(mainClock, 125);
             } else {
                 time_element.innerHTML = "0:00";
-                setTimeout(mainClock, 10000)
+                setTimeout(mainClock, 10000);
             }
         }
 
         function loadSavedTime() {
             try {
-                var savedSeconds = localStorage.getItem("savedSeconds")
-                console.log("Accessed localStorage. Using saved seconds")
-                setBellSeconds(savedSeconds)
+                var savedSeconds = localStorage.getItem("savedSeconds");
+                console.log("Accessed localStorage. Using saved seconds");
+                setBellSeconds(savedSeconds);
             } catch (error) {
                 console.warn("Could not access localStorage. Is private browsing enabled?");
             }
         }
 
         function connectionFail() {
-            console.warn("Fetching seconds failed. Fetching storage.")
+            console.warn("Fetching seconds failed. Fetching storage.");
             try {
-                var savedSeconds = localStorage.getItem("savedSeconds")
-                console.log("Accessed storage. Using saved seconds")
-                setBellSeconds(savedSeconds)
+                var savedSeconds = localStorage.getItem("savedSeconds");
+                console.log("Accessed storage. Using saved seconds");
+                setBellSeconds(savedSeconds);
             } catch (error) {
                 console.warn("Could not access localStorage. Is private browsing enabled?");
             }
@@ -104,21 +106,21 @@
             var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
-					setBellSeconds(this.responseText)
-					console.log('Api connection success')
+					setBellSeconds(this.responseText);
+					console.log('Api connection success');
 					try {
-						localStorage.setItem("savedSeconds", bellSeconds)
+						localStorage.setItem("savedSeconds", bellSeconds);
 					} catch (error) {
 						console.warn("Could not save seconds to localStorage. Is private browsing enabled?");
 					}
 				} else if (this.readyState == 4 && this.status != 200) {
-					connectionFail()
+					connectionFail();
 				}
 			};
 
-            xhttp.timeout = 5000
+            xhttp.timeout = 5000;
 			xhttp.ontimeout = function (e) {
-			    connectionFail()
+			    connectionFail();
 			};
 
 			xhttp.open("GET", "/api/seconds", true);
@@ -127,12 +129,15 @@
 
         function initialize() {
             time_element = document.getElementById("time");
-            offset_element = document.getElementById("second-offset")
+            offset_element = document.getElementById("second-offset");
+            indicator = document.getElementById("cache-indicator");
+            cacheMeter = document.getElementById("cache-meter");
+
             mainClock();
             // LocalStorage
             loadSavedTime();
             // Server
-            getAsyncTime()
+            getAsyncTime();
              /*time_element.style['fontSize'] = "40em"
             resize()*/
         }
@@ -152,11 +157,66 @@
             singleBound()
         } */
 
+        function stopIndicatorSpining() { indicator.style.animation = "none"; }
+        function fade(element) {
+            var op = 1;  // initial opacity
+            var timer = setInterval(function () {
+                if (op <= 0.1){
+                    clearInterval(timer);
+                    element.style.display = 'none';
+                }
+                element.style.opacity = op;
+                element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op -= op * 0.2;
+            }, 25);
+        }
 
+        function hideIndicator() {
+            setTimeout(function() {
+                fade(indicator)
+            }, 3000)
+        }
+
+        // Caching
+        var cache = window.applicationCache;
+
+        function checkingForCache() {
+            console.log("Checking cache");
+            indicator.style.animation = "spin 4s linear infinite";
+            indicator.innerText = "↻";
+        }
+
+        function noUpdate() {
+            console.log("Nothing to update");
+            stopIndicatorSpining();
+            indicator.innerText = "○";
+            hideIndicator()
+        }
+
+        function cacheUpdateReadyListener(event) {
+            console.log("Swapping Cache");
+            cache.swapCache();
+            stopIndicatorSpining();
+            indicator.innerText = "✓";
+            hideIndicator()
+        }
+
+        function cacheErrorListener(event) {
+            console.error("Cache error occured");
+            stopIndicatorSpining();
+            indicator.innerText = "✗";
+            hideIndicator()
+        }
+
+        cache.addEventListener('checking', checkingForCache, false);
+        cache.addEventListener('updateready', cacheUpdateReadyListener, false);
+        cache.addEventListener('noupdate', noUpdate, false);
+        cache.addEventListener('error', cacheErrorListener, false);
     </script>
 </head>
 <body onload="initialize()">
     <p id="second-offset"></p>
+    <p id="cache-indicator">●</p>
 	<section id="time-wrapper">
 		<p id="time">••••</p>
 	</section>

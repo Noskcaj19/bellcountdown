@@ -35,6 +35,37 @@ html, body, .time-wrapper {
     font-size: 1.3em;
 }
 
+#cache-indicator {
+	position: absolute;
+	right: 1em;
+	top: 1em;
+	padding: 0;
+    margin: 0;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 1.3em;
+}
+
+.hidden {
+	position: relative;
+    top: -100px;
+    -webkit-transition: height 0.5s linear;
+       -moz-transition: height 0.5s linear;
+        -ms-transition: height 0.5s linear;
+         -o-transition: height 0.5s linear;
+            transition: height 0.5s linear;
+}
+
+.visible {
+     top: 200px;
+     -webkit-transition: height 0.5s linear;
+        -moz-transition: height 0.5s linear;
+         -ms-transition: height 0.5s linear;
+          -o-transition: height 0.5s linear;
+             transition: height 0.5s linear;
+}
+
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 @font-face {
 	font-family: San Francisco Ultralight;
 	src: url('/fonts/San Francisco Ultralight.ttf');
