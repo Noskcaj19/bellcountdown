@@ -19,7 +19,7 @@ def welcome_page():
 
 @app.route('/schedule/')
 @app.route('/schedule/<string:type>')
-def temp_schedule(type=None):
+def static_schedule(type=None):
     if type == None:
         flash("No schedule selected, please use one of the links.")
         return redirect("/")

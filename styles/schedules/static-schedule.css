@@ -19,7 +19,6 @@ html, body, .time-wrapper {
 #time-wrapper > #time {
 	display: table-cell;
 	vertical-align: middle;
-	font-size: 40vw;
 	margin: 0;
 	font-family: "San Francisco Ultralight", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	color: black;
@@ -43,6 +42,76 @@ html, body, .time-wrapper {
     margin: 0;
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 1.3em;
+}
+
+#settings-button {
+	position: absolute;
+    right: 1em;
+    bottom: 1em;
+	width: 1.5em;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	text-align: center;
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    width: 50%; /* Could be more or less, depending on screen size */
+	border-radius: 1.2em;
+    border-width: 0;
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#server-offset-label-container {
+    padding-right: .25em;
+    margin: .5em;
+    margin-bottom: 0;
+}
+#server-offset-label {
+    display: inline-block;
+}
+
+#set-to-server-time {
+    background-color: lightgrey;
+    width: 11em;
+    border-radius: 1em;
+    padding: 0.25em;
+    margin: .25em auto;
+}
+
+#custom-second-offset {
+	border-color: black;
+    border-width: 1px;
+	border-radius: .25em;
 }
 
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

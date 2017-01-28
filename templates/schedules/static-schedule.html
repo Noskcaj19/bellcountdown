@@ -5,7 +5,7 @@
     <!--{% include "ga.html" %} -->
     <meta charset="UTF-8">
     <title>Schedule - {{ schedule_type.capitalize() }}</title>
-    <link rel="stylesheet" href="/styles/schedules/static-schedule.css">
+    <link type="text/css" rel="stylesheet" title="styles" href="/styles/schedules/static-schedule.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-title" content="Countdown">
@@ -13,10 +13,12 @@
 	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
     <script type="text/javascript">
         var bellSeconds = 0;
-        var period
-		var bellTimes
-        var indicator;
-        var cacheMeter;
+        var period;
+		var bellTimes;
+		var serverSeconds;
+        var indicator, cacheMeter;
+        var modal, modalContent;
+        var serverSecondOffsetLabel,customSecondOffsetInput;
 
         function MillisecondsToTime(duration) {
             var seconds = parseInt((duration/1000)%60);
@@ -29,7 +31,7 @@
         }
 
         function setBellSeconds(newTime) {
-            bellSeconds = parseInt(newTime);
+            bellSeconds = parseFloat(newTime);
             if (isNaN(bellSeconds)) {
                bellSeconds = 0.0;
             }
@@ -71,10 +73,11 @@
 
         function mainClock() {
             var time_now = Date.now();
-            var period = currentPeriods(time_now);
+            period = currentPeriods(time_now);
             var isWeekend = new Date().getDay()%6==0;
             if (period != null && !isWeekend) {
                 time_element.innerHTML = MillisecondsToTime(bellTimes[period] - time_now);
+                /* resize() */ /* Not performance tested yet */
                 setTimeout(mainClock, 125);
             } else {
                 time_element.innerHTML = "0:00";
@@ -106,10 +109,10 @@
             var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
 				if (this.readyState == 4 && this.status == 200) {
-					setBellSeconds(this.responseText);
-					console.log('Api connection success');
+					console.log('Api connection success.');
 					try {
-						localStorage.setItem("savedSeconds", bellSeconds);
+						serverSeconds = parseFloat(this.responseText);
+						setServerOffsetLabel()
 					} catch (error) {
 						console.warn("Could not save seconds to localStorage. Is private browsing enabled?");
 					}
@@ -132,30 +135,87 @@
             offset_element = document.getElementById("second-offset");
             indicator = document.getElementById("cache-indicator");
             cacheMeter = document.getElementById("cache-meter");
+            modal = document.getElementById("settings-modal");
+            modalContent = document.getElementById("modal-content");
+            serverSecondOffsetLabel = document.getElementById("server-offset-label")
+            customSecondOffsetInput = document.getElementById("custom-second-offset");
 
+            // Start main loop
             mainClock();
+            // Probably alright to run once
+            resize();
             // LocalStorage
             loadSavedTime();
             // Server
             getAsyncTime();
-             /*time_element.style['fontSize'] = "40em"
-            resize()*/
+            // Configure settings page
+            setLocalOffsetLabel();
+            // setServerOffsetLabel()
         }
 
-        // Having critical issues
-        /*function resize() {
-            var bounds = time_element.getBoundingClientRect()
-            function singleBound() {
-                bounds = time_element.getBoundingClientRect()
-                if (bounds['left'] < 0) {
-                    var fontSizeStr = time_element.style.fontSize
-                    var fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2))
-                    time_element.style.fontSize = (fontSizeInt - 1) + "em;"
-                    singleBound()
+        // Untested - May have performance issues
+        function resize() {
+            var bounds;
+            function expand() {
+                bounds = time_element.getBoundingClientRect();
+                if (bounds['left'] > 0) {
+                    console.log(bounds['left']);
+                    fontSizeStr = time_element.style['fontSize'];
+                    fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2));
+                    time_element.style['fontSize'] = (fontSizeInt + 1) + "vw";
+                    expand()
                 }
             }
-            singleBound()
-        } */
+            function shrink() {
+                bounds = time_element.getBoundingClientRect();
+                if (bounds['left'] < 0) {
+                    console.log(bounds['left']);
+                    fontSizeStr = time_element.style['fontSize'];
+                    fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2));
+                    time_element.style['fontSize'] = (fontSizeInt - 1) + "vw";
+                    shrink();
+                }
+            }
+            expand();
+            shrink();
+        }
+
+
+        // Settings Modal
+        function openSettings() {
+            modal.style.display = "block";
+        }
+        function closeSettings() {
+            modal.style.display = "none";
+        }
+        function setLocalOffsetLabel() {
+            try {
+                savedSeconds = localStorage.getItem("savedSeconds");
+                customSecondOffsetInput.value = savedSeconds
+            } catch (error) {
+                console.warn("Could not access localStorage. Is private browsing enabled?");
+            }
+        }
+        function setServerOffsetLabel() {
+        	serverSecondOffsetLabel.innerText = serverSeconds;
+        }
+
+        function syncClientTime() {
+        	localStorage.setItem("savedSeconds", serverSeconds);
+        	setBellSeconds(serverSeconds);
+        	setLocalOffsetLabel();
+        }
+
+        function changeClientSeconds() {
+        	localStorage.setItem("savedSeconds", customSecondOffsetInput.value);
+        	setBellSeconds(customSecondOffsetInput.value);
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
 
         function stopIndicatorSpining() { indicator.style.animation = "none"; }
         function fade(element) {
@@ -203,14 +263,14 @@
 
         function firstCacheComplete() {
             stopIndicatorSpining();
-            indicator.innerText = "";
+            indicator.innerText = "○";
             hideIndicator()
         }
 
         function cacheErrorListener(event) {
             console.error("Cache error occured");
             stopIndicatorSpining();
-            indicator.innerText = "✗";
+            indicator.innerText = "☓";
             hideIndicator()
         }
 
@@ -224,8 +284,22 @@
 <body onload="initialize()">
     <p id="second-offset"></p>
     <p id="cache-indicator">●</p>
+    <img id="settings-button" src="/imgs/settings.svg" onclick="openSettings()">
 	<section id="time-wrapper">
-		<p id="time">••••</p>
+		<p id="time" style="font-size: 40vw;">••••</p>
 	</section>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSettings()">&times;</span>
+            <h1>Settings</h1>
+            <hr>
+            <p id="server-offset-label-container">The current server offset is: <span id="server-offset-label">Loading ...</span> </p>
+            <div id="set-to-server-time" onclick="syncClientTime()">Sync to server time ↓</div>
+            <label for="custom-second-offset">Custom Second Offset: </label>
+            <input id="custom-second-offset" type="number" min="0" max="60" step="0.01" onchange="changeClientSeconds()">
+        </div>
+
+    </div>
 </body>
 </html>

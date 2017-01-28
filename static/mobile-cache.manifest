@@ -1,7 +1,8 @@
 CACHE MANIFEST
-# Cache manifest version 0.1.0
+# Cache manifest version 0.2.0
 /styles/schedules/static-schedule.css
 /fonts/San%20Francisco%20Ultralight.ttf
+/imgs/settings.svg
 
 NETWORK:
 /api/seconds
