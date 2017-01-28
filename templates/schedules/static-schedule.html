@@ -10,9 +10,11 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-title" content="Countdown">
 	<meta name="format-detection" content="telephone=no">
-	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+ 	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
     <script type="text/javascript">
         var bellSeconds = 0;
+        var hasRun;
         var period;
 		var bellTimes;
 		var serverSeconds;
@@ -71,6 +73,13 @@
             return null;
         }
 
+        function checkFirstRun() {
+            hasRun = localStorage.getItem("hasRun") ? true : false
+            if (!hasRun) {
+                console.log("First run")
+                localStorage.setItem("hasRun", true)
+            }
+        }
         function mainClock() {
             var time_now = Date.now();
             period = currentPeriods(time_now);
@@ -112,6 +121,10 @@
 					console.log('Api connection success.');
 					try {
 						serverSeconds = parseFloat(this.responseText);
+						if (!hasRun) {
+						    localStorage.setItem("savedSeconds", serverSeconds);
+						    setBellSeconds(serverSeconds)
+                        }
 						setServerOffsetLabel()
 					} catch (error) {
 						console.warn("Could not save seconds to localStorage. Is private browsing enabled?");
@@ -140,6 +153,8 @@
             serverSecondOffsetLabel = document.getElementById("server-offset-label")
             customSecondOffsetInput = document.getElementById("custom-second-offset");
 
+            // Check first run
+            checkFirstRun();
             // Start main loop
             mainClock();
             // Probably alright to run once
