@@ -11,11 +11,9 @@ def development():
     else:
         return False
 
-
 @app.route('/')
 def welcome_page():
     return render_template("welcome.html", development=development())
-
 
 @app.route('/schedule/')
 @app.route('/schedule/<string:type>')

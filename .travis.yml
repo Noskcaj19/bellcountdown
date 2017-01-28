@@ -1,11 +1,8 @@
+# Beta site deployment configuration
+
 # Use Dockerized infrastructure
 sudo: false
 language: python
-
-# Cache our Gcloud SDK between commands
-cache:
-  directories:
-  - "/home/travis/google-cloud-sdk/"
 
 deploy:
   provider: gae
@@ -17,8 +14,6 @@ deploy:
   no_promote: true
   no_stop_previous_version: true
   default: true
-  on:
-    all_branches: true
 
 before_install:
 # Decrypt the credentials we added to the repo using the key we added with the Travis command line tool
