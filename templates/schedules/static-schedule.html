@@ -7,7 +7,6 @@
     <title>Schedule - {{ schedule_type.capitalize() }}</title>
     <link type="text/css" rel="stylesheet" title="styles" href="/styles/schedules/static-schedule.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-title" content="Countdown">
 	<meta name="format-detection" content="telephone=no">
     <meta name="viewport" content="width=device-width, user-scalable=no">
@@ -299,14 +298,14 @@
 <body onload="initialize()">
     <p id="second-offset"></p>
     <p id="cache-indicator">●</p>
-    <img id="settings-button" src="/imgs/settings.svg" onclick="openSettings()">
+    <img id="settings-button" src="/imgs/settings.svg" ontouchend="openSettings()">
 	<section id="time-wrapper">
 		<p id="time" style="font-size: 40vw;">••••</p>
 	</section>
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeSettings()">&times;</span>
+            <span class="close" ontouchend="closeSettings()">&times;</span>
             <h1>Settings</h1>
             <hr>
             <p id="server-offset-label-container">The current server offset is: <span id="server-offset-label">Loading ...</span> </p>
