@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html manifest="/mobile-cache.manifest" lang="en">
 <head>
-    <!-- TODO: Determine if ga is causing delay on startup -->
-    <!--{% include "ga.html" %} -->
     <meta charset="UTF-8">
     <title>Schedule - {{ schedule_type.capitalize() }}</title>
     <link type="text/css" rel="stylesheet" title="styles" href="/styles/schedules/static-schedule.css">
@@ -73,7 +71,8 @@
         }
 
         function checkFirstRun() {
-            hasRun = localStorage.getItem("hasRun") ? true : false
+            // Set client time to server time if first run
+            hasRun = !!localStorage.getItem("hasRun")
             if (!hasRun) {
                 console.log("First run")
                 localStorage.setItem("hasRun", true)
@@ -298,14 +297,14 @@
 <body onload="initialize()">
     <p id="second-offset"></p>
     <p id="cache-indicator">●</p>
-    <img id="settings-button" src="/imgs/settings.svg" ontouchend="openSettings()">
+    <img id="settings-button" src="/imgs/settings.svg" ontouchend="openSettings()" onclick="openSettings()">
 	<section id="time-wrapper">
 		<p id="time" style="font-size: 40vw;">••••</p>
 	</section>
 
     <div id="settings-modal" class="modal">
         <div class="modal-content">
-            <span class="close" ontouchend="closeSettings()">&times;</span>
+            <span class="close" ontouchend="closeSettings()" onclick="closeSettings()">&times;</span>
             <h1>Settings</h1>
             <hr>
             <p id="server-offset-label-container">The current server offset is: <span id="server-offset-label">Loading ...</span> </p>
