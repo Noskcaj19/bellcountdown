@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html manifest="/mobile-cache.manifest" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spining - Schedule {{ schedule_type.capitalize() }}</title>
+    <link type="text/css" rel="stylesheet" title="styles" href="/styles/schedules/static-schedule.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="Countdown">
+	<meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+ 	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
+    <script type="text/javascript">
+        var bellSeconds = 0;
+        var hasRun;
+        var period;
+		var bellTimes;
+		var serverSeconds;
+        var indicator, cacheMeter;
+        var modal, modalContent;
+        var serverSecondOffsetLabel,customSecondOffsetInput;
+        var rotationInterval;
+        var currentRotationAmount = 0;
+
+        function MillisecondsToTime(duration) {
+            var seconds = parseInt((duration/1000)%60);
+            var minutes = parseInt((duration/(1000*60))%60);
+            var hours = parseInt((duration/(1000*60*60))%24);
+
+            hours = (hours == 0) ? "" : hours + ":";
+            seconds = (seconds < 10) ? "0" + seconds : seconds;
+            return hours + minutes + ":" + seconds;
+        }
+
+        function setBellSeconds(newTime) {
+            bellSeconds = parseFloat(newTime);
+            if (isNaN(bellSeconds)) {
+               bellSeconds = 0.0;
+            }
+            offset_element.innerText = bellSeconds;
+            setupBellTimes();
+        }
+
+		function setupBellTimes() {
+            console.log("Making times table with %s", bellSeconds);
+			bellTimes = [
+				new Date().setHours(7, 21, bellSeconds), //start of school, first bell
+				new Date().setHours(8, 30, bellSeconds), //end of first
+				new Date().setHours(9, 26, bellSeconds), //end of second
+				new Date().setHours(10, 22, bellSeconds), //end of third
+				new Date().setHours(11, 18, bellSeconds), //end of fourth
+				{% if schedule_type == "a" %}
+				new Date().setHours(11, 49, bellSeconds), //end of lunch
+				{% elif schedule_type == "b" %}
+				new Date().setHours(12, 14, bellSeconds), //end of fifth
+				{% endif %}
+				new Date().setHours(12, 45, bellSeconds), //end of fifth
+				new Date().setHours(13, 41, bellSeconds), //end of sixth
+				new Date().setHours(14, 37, bellSeconds)  //end of school
+			]
+		}
+
+		function currentPeriods(now) {
+            if (!bellTimes) { setupBellTimes(); }
+            if (now < bellTimes[0] || now > bellTimes[bellTimes.length-1]) {
+                return null;
+            }
+            for (i = 0; i < bellTimes.length; i++) {
+                if (now >= bellTimes[i] && now <= bellTimes[i + 1]) {
+                    return i + 1;
+                }
+            }
+            return null;
+        }
+
+        function checkFirstRun() {
+            // Set client time to server time if first run
+            hasRun = !!localStorage.getItem("hasRun")
+            if (!hasRun) {
+                console.log("First run")
+                localStorage.setItem("hasRun", true)
+            }
+        }
+        function mainClock() {
+            var time_now = Date.now();
+            period = currentPeriods(time_now);
+            var isWeekend = new Date().getDay()%6==0;
+            if (period != null && !isWeekend) {
+                time_element.innerHTML = MillisecondsToTime(bellTimes[period] - time_now);
+                /* resize() */ /* Not performance tested yet */
+                setTimeout(mainClock, 125);
+            } else {
+                time_element.innerHTML = "0:00";
+                setTimeout(mainClock, 10000);
+            }
+        }
+
+        function loadSavedTime() {
+            try {
+                var savedSeconds = localStorage.getItem("savedSeconds");
+                console.log("Accessed localStorage. Using saved seconds");
+                setBellSeconds(savedSeconds);
+            } catch (error) {
+                console.warn("Could not access localStorage. Is private browsing enabled?");
+            }
+        }
+
+        function connectionFail() {
+            console.warn("Fetching seconds failed. Fetching storage.");
+            try {
+                var savedSeconds = localStorage.getItem("savedSeconds");
+                console.log("Accessed storage. Using saved seconds");
+                setBellSeconds(savedSeconds);
+            } catch (error) {
+                console.warn("Could not access localStorage. Is private browsing enabled?");
+            }
+        }
+        function getAsyncTime() {
+            var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					console.log('Api connection success.');
+					try {
+						serverSeconds = parseFloat(this.responseText);
+						if (!hasRun) {
+						    localStorage.setItem("savedSeconds", serverSeconds);
+						    setBellSeconds(serverSeconds)
+                        }
+						setServerOffsetLabel()
+					} catch (error) {
+						console.warn("Could not save seconds to localStorage. Is private browsing enabled?");
+					}
+				} else if (this.readyState == 4 && this.status != 200) {
+					connectionFail();
+				}
+			};
+
+            xhttp.timeout = 5000;
+			xhttp.ontimeout = function (e) {
+			    connectionFail();
+			};
+
+			xhttp.open("GET", "/api/seconds", true);
+			xhttp.send();
+        }
+
+        function initialize() {
+            time_element = document.getElementById("time");
+            offset_element = document.getElementById("second-offset");
+            indicator = document.getElementById("cache-indicator");
+            cacheMeter = document.getElementById("cache-meter");
+            modal = document.getElementById("settings-modal");
+            modalContent = document.getElementById("modal-content");
+            serverSecondOffsetLabel = document.getElementById("server-offset-label")
+            customSecondOffsetInput = document.getElementById("custom-second-offset");
+
+            // Check first run
+            checkFirstRun();
+            // Start main loop
+            mainClock();
+            // Probably alright to run once
+            resize();
+            // LocalStorage
+            loadSavedTime();
+            // Server
+            getAsyncTime();
+            // Configure settings page
+            setLocalOffsetLabel();
+            // Start spining
+            rotationInterval = setInterval(spin, 22)
+            // GA
+            startGA();
+        }
+
+        // Untested - May have performance issues
+        function resize() {
+            var bounds;
+            function expand() {
+                bounds = time_element.getBoundingClientRect();
+                if (bounds['left'] > 0) {
+                    console.log(bounds['left']);
+                    fontSizeStr = time_element.style['fontSize'];
+                    fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2));
+                    time_element.style['fontSize'] = (fontSizeInt + 1) + "vw";
+                    expand()
+                }
+            }
+            function shrink() {
+                bounds = time_element.getBoundingClientRect();
+                if (bounds['left'] < 200) {
+                    console.log(bounds['left']);
+                    fontSizeStr = time_element.style['fontSize'];
+                    fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2));
+                    time_element.style['fontSize'] = (fontSizeInt - 1) + "vw";
+                    shrink();
+                }
+            }
+            expand();
+            shrink();
+        }
+
+
+        // Settings Modal
+        function openSettings() {
+            modal.style.display = "block";
+        }
+        function closeSettings() {
+            modal.style.display = "none";
+        }
+        function setLocalOffsetLabel() {
+            try {
+                savedSeconds = localStorage.getItem("savedSeconds");
+                customSecondOffsetInput.value = savedSeconds
+            } catch (error) {
+                console.warn("Could not access localStorage. Is private browsing enabled?");
+            }
+        }
+        function setServerOffsetLabel() {
+        	serverSecondOffsetLabel.innerText = serverSeconds;
+        }
+
+        function syncClientTime() {
+        	localStorage.setItem("savedSeconds", serverSeconds);
+        	setBellSeconds(serverSeconds);
+        	setLocalOffsetLabel();
+        }
+
+        function changeClientSeconds() {
+        	localStorage.setItem("savedSeconds", customSecondOffsetInput.value);
+        	setBellSeconds(customSecondOffsetInput.value);
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+
+        function stopIndicatorSpining() { indicator.style.animation = "none"; }
+        function fade(element) {
+            var op = 1;  // initial opacity
+            var timer = setInterval(function () {
+                if (op <= 0.1){
+                    clearInterval(timer);
+                    element.style.display = 'none';
+                }
+                element.style.opacity = op;
+                element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op -= op * 0.2;
+            }, 25);
+        }
+
+        function hideIndicator() {
+            setTimeout(function() {
+                fade(indicator)
+            }, 3000)
+        }
+
+        // Google Analytics
+        /* This greatly improves load speed */
+        function startGA() {
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-85980694-3', 'auto');
+            ga('send', 'pageview');
+        }
+
+        // Caching
+        var cache = window.applicationCache;
+
+        function checkingForCache() {
+            console.log("Checking cache");
+            indicator.style.animation = "spin 4s linear infinite";
+            indicator.innerText = "↻";
+        }
+
+        function noUpdate() {
+            console.log("Nothing to update");
+            stopIndicatorSpining();
+            indicator.innerText = "○";
+            hideIndicator()
+        }
+
+        function cacheUpdateReadyListener() {
+            console.log("Swapping Cache");
+            cache.swapCache();
+            stopIndicatorSpining();
+            indicator.innerText = "✓";
+            hideIndicator()
+        }
+
+        function firstCacheComplete() {
+            stopIndicatorSpining();
+            indicator.innerText = "○";
+            hideIndicator()
+        }
+
+        function cacheErrorListener() {
+            console.error("Cache error occured");
+            stopIndicatorSpining();
+            indicator.innerText = "☓";
+            hideIndicator()
+        }
+
+        cache.addEventListener('checking', checkingForCache, false);
+        cache.addEventListener('updateready', cacheUpdateReadyListener, false);
+        cache.addEventListener('noupdate', noUpdate, false);
+        cache.addEventListener('cached', firstCacheComplete, false);
+        cache.addEventListener('error', cacheErrorListener, false);
+
+        // Spining
+        function spin() {
+            time_element.style.transform = "rotate(" + currentRotationAmount + "deg)"
+			if (currentRotationAmount >= 360) {
+				currentRotationAmount = 0
+			} else {
+				currentRotationAmount += 1
+			}
+        }
+
+    </script>
+</head>
+<body onload="initialize()">
+    <p id="second-offset"></p>
+    <p id="cache-indicator">●</p>
+    <img id="settings-button" src="/imgs/settings.svg" ontouchend="openSettings()" onclick="openSettings()">
+	<section id="time-wrapper">
+		<p id="time" style="font-size: 40vw;">••••</p>
+	</section>
+
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" ontouchend="closeSettings()" onclick="closeSettings()">&times;</span>
+            <h1>Settings</h1>
+            <hr>
+            <p id="server-offset-label-container">The current server offset is: <span id="server-offset-label">Loading ...</span> </p>
+            <div id="set-to-server-time" onclick="syncClientTime()">Sync to server time ↓</div>
+            <label for="custom-second-offset">Custom Second Offset: </label>
+            <input id="custom-second-offset" type="number" min="0" max="60" step="0.01" onchange="changeClientSeconds()">
+        </div>
+
+    </div>
+</body>
+</html>
