@@ -1,7 +1,7 @@
 {
   "name": "Bell Countdown",
   "short_name": "Countdown",
-  "start_url": ".",
+  "start_url": "/schedule/b/spin",
   "display": "standalone",
   "background_color": "#fff",
   "description": "A countdown to the bell.",
