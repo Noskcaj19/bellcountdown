@@ -10,6 +10,12 @@ def development():
     else:
         return False
 
+# Routing v1 users
+@app.route('/s', defaults={'path': ''})
+@app.route('/s/<path:path>')
+def catch_all_old_url(path):
+    flash("", "redirect")
+    return redirect("/", 301)
 
 @app.route('/')
 def welcome_page():
