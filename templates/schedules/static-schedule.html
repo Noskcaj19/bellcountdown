@@ -74,9 +74,9 @@
 
         function checkFirstRun() {
             // Set client time to server time if first run
-            hasRun = !!localStorage.getItem("hasRun")
+            hasRun = !!localStorage.getItem("hasRun");
             if (!hasRun) {
-                console.log("First run")
+                console.log("First run");
                 localStorage.setItem("hasRun", true)
             }
         }
@@ -86,7 +86,7 @@
             var isWeekend = new Date().getDay()%6==0;
             if (period != null && !isWeekend) {
                 time_element.innerHTML = MillisecondsToTime(bellTimes[period] - time_now);
-                /* resize() */ /* Not performance tested yet */
+                resize(); /* Not performance tested yet */
                 setTimeout(mainClock, 125);
             } else {
                 time_element.innerHTML = "0:00";
@@ -97,6 +97,9 @@
         function loadSavedTime() {
             try {
                 var savedSeconds = localStorage.getItem("savedSeconds");
+                if (savedSeconds == null) {
+                    savedSeconds = 0.0
+                }
                 console.log("Accessed localStorage. Using saved seconds");
                 setBellSeconds(savedSeconds);
             } catch (error) {
@@ -106,13 +109,7 @@
 
         function connectionFail() {
             console.warn("Fetching seconds failed. Fetching storage.");
-            try {
-                var savedSeconds = localStorage.getItem("savedSeconds");
-                console.log("Accessed storage. Using saved seconds");
-                setBellSeconds(savedSeconds);
-            } catch (error) {
-                console.warn("Could not access localStorage. Is private browsing enabled?");
-            }
+            loadSavedTime()
         }
         function getAsyncTime() {
             var xhttp = new XMLHttpRequest();
@@ -123,7 +120,8 @@
 						serverSeconds = parseFloat(this.responseText);
 						if (!hasRun) {
 						    localStorage.setItem("savedSeconds", serverSeconds);
-						    setBellSeconds(serverSeconds)
+						    setBellSeconds(serverSeconds);
+                            setLocalOffsetLabel();
                         }
 						setServerOffsetLabel()
 					} catch (error) {
@@ -175,7 +173,6 @@
             function expand() {
                 bounds = time_element.getBoundingClientRect();
                 if (bounds['left'] > 0) {
-                    console.log(bounds['left']);
                     fontSizeStr = time_element.style['fontSize'];
                     fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2));
                     time_element.style['fontSize'] = (fontSizeInt + 1) + "vw";
@@ -185,7 +182,6 @@
             function shrink() {
                 bounds = time_element.getBoundingClientRect();
                 if (bounds['left'] < 0) {
-                    console.log(bounds['left']);
                     fontSizeStr = time_element.style['fontSize'];
                     fontSizeInt = parseInt(fontSizeStr.substr(0, fontSizeStr.length - 2));
                     time_element.style['fontSize'] = (fontSizeInt - 1) + "vw";
@@ -206,7 +202,7 @@
         }
         function setLocalOffsetLabel() {
             try {
-                savedSeconds = localStorage.getItem("savedSeconds");
+                var savedSeconds = localStorage.getItem("savedSeconds");
                 customSecondOffsetInput.value = savedSeconds
             } catch (error) {
                 console.warn("Could not access localStorage. Is private browsing enabled?");
