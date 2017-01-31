@@ -1,12 +1,12 @@
 body {
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #f0f0f2;
-    margin: 0;
-    padding: 0;
+	font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	background-color: #f0f0f2;
+	margin: 0;
+	padding: 0;
 }
 
 h1.title {
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 div#schedule-links {
@@ -16,12 +16,12 @@ div#schedule-links {
 }
 
 div#schedule-links p#question {
-    margin-bottom: 1.5em;
+	margin-bottom: 1.5em;
 }
 
 div#schedule-links p#temp-notice {
 	margin-bottom: 1.9em;
-    margin-top: .2em;
+	margin-top: .2em;
 }
 
 div#schedule-links a:first-of-type {
@@ -38,20 +38,20 @@ div#schedule-links a:last-of-type {
 .box {
 	width: 600px;
 	margin: 5em auto;
-    padding: 4.5vh 2vw;
+	padding: 4.5vh 2vw;
 	background-color: #fff;
 	border-radius: .75em;
 	text-align: center;
 }
 
 div#beta-warning-container {
-    text-align: center;
-    display: inline-block;
+	text-align: center;
+	display: inline-block;
 }
 
 p#beta-warning {
-    text-align: left;
-    margin-bottom: 0;
+	text-align: left;
+	margin-bottom: 0;
 }
 
 div#schedule-links > a:link, div#schedule-links > a:visited {
@@ -64,13 +64,13 @@ div#schedule-links > a:hover {
 }
 
 @media (max-width: 700px) {
-    body {
-        background-color: #fff;
-    }
-    .box {
-        width: auto;
-        margin: 0 auto;
-        border-radius: 0;
-        padding: 1em;
-    }
+	body {
+		background-color: #fff;
+	}
+	.box {
+		width: auto;
+		margin: 0 auto;
+		border-radius: 0;
+		padding: 1em;
+	}
 }
