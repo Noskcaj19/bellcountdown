@@ -127,3 +127,11 @@ html, body, .time-wrapper {
 	font-family: San Francisco Ultralight;
 	src: url('/fonts/San Francisco Ultralight.ttf');
 }
+
+@media (max-width: 700px) {
+    .modal-content {
+        width: auto;
+        margin-left: 1%;
+        margin-right: 1%;
+    }
+}
