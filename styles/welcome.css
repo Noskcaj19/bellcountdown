@@ -16,12 +16,16 @@ div#schedule-links {
 }
 
 div#schedule-links p#question {
-	margin-bottom: 1.5em;
+	margin-bottom: 1.75em;
 }
 
-div#schedule-links p#temp-notice {
-	margin-bottom: 1.9em;
-	margin-top: .2em;
+#offset-separator {
+    width: 50%;
+    margin: 1em auto;
+}
+
+#second-offset-container {
+	margin-bottom: 0;
 }
 
 div#schedule-links a:first-of-type {

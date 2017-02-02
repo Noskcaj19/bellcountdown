@@ -10,36 +10,40 @@ def development():
 	else:
 		return False
 
+
 # Routing v1 users
-@app.route('/s', defaults={'path': ''})
+@app.route('/update-redirect/')
+def update_redirect():
+	return render_template("redirect.html")
+
+@app.route('/s/', defaults={'path': ''})
 @app.route('/s/<path:path>')
 def catch_all_old_url(path):
-	flash("", "redirect")
-	return redirect("/", 301)
+	return redirect("/update-redirect/", 301)
 
 @app.route('/')
 def welcome_page():
-	return render_template("welcome.html", development=development())
+	return render_template("welcome.html", second_offset=ndb_utils.getSecondOffset(), development=development())
 
 @app.route('/schedule/')
 @app.route('/schedule/<string:type>/')
 def static_schedule(type=None):
 	if type == None:
-		flash("No schedule selected, please use one of the links.")
+		flash("No schedule selected, please use one of the links.", "error")
 		return redirect("/")
 	elif type not in ["a", "b"]:
-		flash("Invald schedule selected, please use one of the links.")
+		flash("Invald schedule selected, please use one of the links.", "error")
 		return redirect("/")
 	return render_template("schedules/static-schedule.html", schedule_type=type)
 
 @app.route('/schedule/<string:type>/spin/')
 def static_spining_schedule(type=None):
 	if type == None:
-		flash("No schedule selected, please use one of the links.")
-		return redirect("/")
-	elif type not in ["a", "b"]:
-		flash("Invald schedule selected, please use one of the links.")
-		return redirect("/")
+		flash("No schedule selected, please use one of the links.", "error")
+		return redirect('/')
+	elif type not in ['a', 'b']:
+		flash("Invald schedule selected, please use one of the links.", "error")
+		return redirect('/')
 	return render_template("schedules/static_spining-schedule.html", schedule_type=type)
 
 @app.route('/api/seconds/')
@@ -48,8 +52,8 @@ def server_second_offset():
 
 @app.route('/api/setSeconds/', methods=["POST"])
 def set_server_second_offset():
-	new_seconds = request.form.get("newSeconds", "")
-	credentials = request.form.get("credentials", None)
+	new_seconds = request.form.get('newSeconds', "")
+	credentials = request.form.get('credentials', None)
 
 	if new_seconds == "":
 		return "Missing form field", 400

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="/styles/redirect.css">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width" />
+		<title>Update</title>
+	</head>
+	<body onload="setVisibleSection()">
+		<div class="box">
+			<h1>There's been an update!</h1>
+			<hr>
+			<div id="web-app" hidden>
+				<p>Unfortunately, this means that you will have to delete this app from your home screen.</p>
+				<p>After that, you can go to
+					<a href="https://bellcountdown.appspot.com/">bellcountdown.appspot.com</a>
+					and add your schedule back to the home screen.</p>
+			</div>
+			<div id="browser" hidden>
+				<p>This link no longer works.</p>
+				<p>Please go back <a href="/ ">home</a> and choose a schedule</p>
+			</div>
+		</div>
+	</body>
+
+	<script>
+		function setVisibleSection() {
+			if (window.navigator.standalone) {
+				document.getElementById('web-app').hidden = false
+			} else {
+				document.getElementById('browser').hidden = false
+			}
+		}
+	</script>
+</html>

@@ -39,6 +39,12 @@ handlers:
   upload: static/mobile-cache.manifest
   mime_type: text/cache-manifest
 
+# Migration Manifest
+- url: /cache\.manifest
+  static_files: static/legacy-manifest.manifet
+  upload: static/legacy-manifest.manifet
+  mime_type: text/cache-manifest
+
 # This handler tells app engine how to route requests to a WSGI application.
 # The script value is in the format <path.to.module>.<wsgi_application>
 # where <wsgi_application> is a WSGI application object.

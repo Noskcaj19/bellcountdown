@@ -1,0 +1,29 @@
+body {
+	background-color: #f0f0f2;
+	font-family: "San Francisco Ultralight", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+
+div.box {
+	width: 600px;
+	margin: 5em auto;
+	padding: 4.5vh 2vw;
+	background-color: #fff;
+	border-radius: .75em;
+	text-align: center;
+}
+
+
+@media (max-width: 700px) {
+	body {
+		background-color: #fff;
+	}
+	div.box {
+		width: auto;
+		margin: 0 auto;
+		border-radius: 0;
+		padding: 1em;
+	}
+}
