@@ -277,8 +277,10 @@
 
 		function checkingForCache() {
 			console.log("Checking cache");
-			indicator.style.animation = "spin 4s linear infinite";
-			indicator.innerText = "↻";
+			if (dev) {
+				indicator.style.animation = "spin 4s linear infinite";
+				indicator.innerText = "↻";
+			}
 		}
 
 		function noUpdate() {
