@@ -6,7 +6,7 @@ language: python
 
 deploy:
   provider: gae
-  # Skip cleanup so api_key.py and vendored dependencies are still there
+  # Skip cleanup so api_key.py and vendor dependencies are still there
   skip_cleanup: true
   keyfile: client-secret.json
   project: bellcountdown
@@ -29,4 +29,3 @@ script:
 # Run the unit tests
 # - python test_main.py
 - echo "No Script to run"
-
