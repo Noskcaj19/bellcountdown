@@ -14,6 +14,7 @@
 	<script type="text/javascript">
 		var bellSeconds = 0;
 		var hasRun;
+		var dev = false;
 		var period;
 		var bellTimes;
 		var serverSeconds;
@@ -165,6 +166,10 @@
 			setLocalOffsetLabel();
 			// GA
 			startGA();
+
+			if (window.location.hash == "#dev") {
+				dev = true
+			}
 		}
 
 		// Untested - May have performance issues
@@ -279,7 +284,7 @@
 		function noUpdate() {
 			console.log("Nothing to update");
 			stopIndicatorSpining();
-			indicator.innerText = "○";
+			indicator.innerText = dev ? "○" : "";
 			hideIndicator()
 		}
 
@@ -293,7 +298,7 @@
 
 		function firstCacheComplete() {
 			stopIndicatorSpining();
-			indicator.innerText = "○";
+			indicator.innerText = dev ? "○" : "";
 			hideIndicator()
 		}
 
