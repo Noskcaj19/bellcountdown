@@ -194,6 +194,18 @@
 
 
 		// Settings Modal
+		// Handle touchscreens
+		function handleTouch(event) {
+			if (event.target == modal) {
+				closeSettings()
+			}
+		}
+		if (window.ontouchstart !== undefined) {
+			window.ontouchstart = handleTouch
+		} else {
+			window.onclick = handleTouch
+		}
+
 		function openSettings() {
 			modal.style.display = "block";
 		}
@@ -222,12 +234,6 @@
 			localStorage.setItem("savedSeconds", customSecondOffsetInput.value);
 			setBellSeconds(customSecondOffsetInput.value);
 		}
-
-		window.onclick = function(event) {
-			if (event.target == modal) {
-				modal.style.display = "none";
-			}
-		};
 
 		function stopIndicatorSpining() { indicator.style.animation = "none"; }
 		function fade(element) {
