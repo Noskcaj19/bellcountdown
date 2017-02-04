@@ -1,15 +1,8 @@
-import os
 import ndb_utils
+import os.path
 from flask import Flask, render_template, redirect, request, flash
 app = Flask(__name__)
 app.secret_key = '9625403974088191.8326510132286338'
-
-def development():
-	if os.environ['SERVER_SOFTWARE'].find('Development') == 0 or os.environ['SERVER_NAME'].find('beta') == 0:
-		return True
-	else:
-		return False
-
 
 # Routing v1 users
 @app.route('/update-redirect/')
@@ -23,7 +16,7 @@ def catch_all_old_url(path):
 
 @app.route('/')
 def welcome_page():
-	return render_template("welcome.html", second_offset=ndb_utils.getSecondOffset(), development=development())
+	return render_template("welcome.html", second_offset=ndb_utils.getSecondOffset())
 
 @app.route('/schedule/')
 @app.route('/schedule/<string:type>/')
