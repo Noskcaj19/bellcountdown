@@ -21,6 +21,7 @@
 		var indicator, cacheMeter;
 		var modal, modalContent;
 		var serverSecondOffsetLabel,customSecondOffsetInput;
+		var noSchoolInterval;
 
 		function MillisecondsToTime(duration) {
 			var seconds = parseInt((duration/1000)%60);
@@ -39,6 +40,15 @@
 			}
 			offset_element.innerText = bellSeconds;
 			setupBellTimes();
+			// Clear lock to make sure new second offset is used
+			clearClockLock()
+		}
+
+		function clearClockLock() {
+			// Clear mainClock lock
+			clearInterval(noSchoolInterval)
+			// And then restart it
+			mainClock()
 		}
 
 		function setupBellTimes() {
@@ -91,7 +101,7 @@
 				setTimeout(mainClock, 125);
 			} else {
 				time_element.innerHTML = "0:00";
-				setTimeout(mainClock, 10000);
+				noSchoolInterval = setTimeout(mainClock, 10000);
 			}
 		}
 
@@ -166,7 +176,7 @@
 			setLocalOffsetLabel();
 			// GA
 			startGA();
-
+			
 			if (window.location.hash == "#dev") {
 				dev = true
 			}
