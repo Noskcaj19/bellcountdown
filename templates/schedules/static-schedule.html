@@ -41,14 +41,14 @@
 			offset_element.innerText = bellSeconds;
 			setupBellTimes();
 			// Clear lock to make sure new second offset is used
-			clearClockLock()
+			clearClockLock();
 		}
 
 		function clearClockLock() {
 			// Clear mainClock lock
-			clearInterval(noSchoolInterval)
+			clearInterval(noSchoolInterval);
 			// And then restart it
-			mainClock()
+			mainClock();
 		}
 
 		function setupBellTimes() {
@@ -122,6 +122,7 @@
 			console.warn("Fetching seconds failed. Fetching storage.");
 			loadSavedTime()
 		}
+
 		function getAsyncTime() {
 			var xhttp = new XMLHttpRequest();
 			xhttp.onreadystatechange = function() {
@@ -161,6 +162,9 @@
 			modalContent = document.getElementById("modal-content");
 			serverSecondOffsetLabel = document.getElementById("server-offset-label")
 			customSecondOffsetInput = document.getElementById("custom-second-offset");
+			days_wrapper = document.getElementById("days-wrapper");
+			days_span = document.getElementById("days");
+			show_days_checkbox = document.getElementById("show-days-checkbox");
 
 			// Check first run
 			checkFirstRun();
@@ -176,13 +180,15 @@
 			setLocalOffsetLabel();
 			// GA
 			startGA();
-			
+			// Days remaining
+			setupDaysLabel();
+
 			if (window.location.hash == "#dev") {
 				dev = true
 			}
 		}
 
-		// Untested - May have performance issues
+		// May have performance issues
 		function resize() {
 			var bounds;
 			function expand() {
@@ -215,6 +221,7 @@
 				closeSettings()
 			}
 		}
+
 		if (window.ontouchstart !== undefined) {
 			window.ontouchstart = handleTouch
 		} else {
@@ -227,6 +234,7 @@
 		function closeSettings() {
 			modal.style.display = "none";
 		}
+
 		function setLocalOffsetLabel() {
 			try {
 				var savedSeconds = localStorage.getItem("savedSeconds");
@@ -282,6 +290,52 @@
 			ga('send', 'pageview');
 		}
 
+		// School days remaining
+		function setupDaysLabel() {
+
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					console.log('Days Api connection success.');
+					setDays(this.responseText);
+					setDaysLabelVisibility();
+				} else if (this.readyState == 4 && this.status != 200) {
+					days_wrapper.innerText = "Error!"
+					setDaysLabelVisibility();
+					console.log("Days Api error.")
+				}
+			};
+
+			xhttp.open("GET", "/api/days_remaining/", true);
+			xhttp.send();
+		}
+
+		function setDaysLabelVisibility() {
+			var showDays = localStorage.getItem("showDays");
+			if (showDays != null) {
+				if (showDays == "1") {
+					show_days_checkbox.checked = true
+					days_wrapper.hidden = false
+				} else {
+					show_days_checkbox.checked = false
+					days_wrapper.hidden = true
+				}
+			}
+		}
+
+		function toggleShowDays() {
+			if (show_days_checkbox.checked) {
+				localStorage.setItem("showDays", 1)
+			} else {
+				localStorage.setItem("showDays", 0)
+			}
+			setDaysLabelVisibility();
+		}
+
+		function setDays(count) {
+			days_span.innerText = count
+		}
+
 		// Caching
 		var cache = window.applicationCache;
 
@@ -335,6 +389,7 @@
 	<section id="time-wrapper">
 		<p id="time" style="font-size: 40vw;">••••</p>
 	</section>
+	<p id="days-wrapper" hidden><span id="days"></span> days left</p>
 
 	<div id="settings-modal" class="modal">
 		<div class="modal-content">
@@ -345,6 +400,9 @@
 			<div id="set-to-server-time" onclick="syncClientTime()">Sync to server time ↓</div>
 			<label for="custom-second-offset">Custom Second Offset: </label>
 			<input id="custom-second-offset" type="number" min="0" max="60" step="0.01" onchange="changeClientSeconds()">
+			<br>
+			<input id="show-days-checkbox" type="checkbox" onchange="toggleShowDays()">
+			<label for="show-days-checkbox">Show school days remaining?</label>
 		</div>
 
 	</div>

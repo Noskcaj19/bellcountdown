@@ -1,10 +1,11 @@
 CACHE MANIFEST
-# Cache manifest version 0.3.2
+# Cache manifest version 0.4.0
 /styles/schedules/static-schedule.css
 /fonts/San%20Francisco%20Ultralight.ttf
 /imgs/settings.svg
 
 NETWORK:
 /api/seconds
+/api/days_remaining
 https://www.google-analytics.com/collect
 https://www.google-analytics.com/analytics.js

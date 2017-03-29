@@ -1,5 +1,6 @@
 import ndb_utils
 import os.path
+from datetime import date, timedelta
 from flask import Flask, render_template, redirect, request, flash
 app = Flask(__name__)
 app.secret_key = '9625403974088191.8326510132286338'
@@ -61,6 +62,14 @@ def set_server_second_offset():
 
 	ndb_utils.set_second_offset(float(new_seconds))
 	return "Success", 200
+
+@app.route('/api/days_remaining/')
+def days_left():
+	today = date.today()
+	target = date(2017, 6, 2)
+	dates = [today + timedelta(x + 1) for x in range((target - today).days)]
+	weekdays = sum(1 for day in dates if day.weekday() < 5)
+	return str(weekdays)
 
 if __name__ == '__main__':
 	app.run()
