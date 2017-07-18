@@ -66,7 +66,7 @@ def set_server_second_offset():
 @app.route('/api/days_remaining/')
 def days_left():
 	today = date.today()
-	target = date(2017, 6, 2)
+	target = date(2018, 5, 31)
 	dates = [today + timedelta(x + 1) for x in range((target - today).days)]
 	weekdays = sum(1 for day in dates if day.weekday() < 5)
 	return str(weekdays)
