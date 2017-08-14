@@ -2,12 +2,12 @@
 <html manifest="/mobile-cache.manifest" lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Spining - Schedule {{ schedule_type.capitalize() }}</title>
+	<title>Spining - Schedule</title>
 	<link type="text/css" rel="stylesheet" title="styles" href="/styles/schedules/static-schedule.css">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="Countdown">
 	<meta name="application-name" content="Countdown">
-	<link rel="manifest" href="/static/spining-schedule_{{ schedule_type }}.webmanifest">
+	<link rel="manifest" href="/static/spining-schedule.webmanifest">
 	<meta name="format-detection" content="telephone=no">
 	<meta name="viewport" content="width=device-width, user-scalable=no">
 	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
@@ -60,14 +60,10 @@
 				new Date().setHours(9, 26, bellSeconds), //end of second
 				new Date().setHours(10, 22, bellSeconds), //end of third
 				new Date().setHours(11, 18, bellSeconds), //end of fourth
-				{% if schedule_type == "a" %}
-				new Date().setHours(11, 49, bellSeconds), //end of lunch
-				{% elif schedule_type == "b" %}
 				new Date().setHours(12, 14, bellSeconds), //end of fifth
-				{% endif %}
-				new Date().setHours(12, 45, bellSeconds), //end of fifth
-				new Date().setHours(13, 41, bellSeconds), //end of sixth
-				new Date().setHours(14, 37, bellSeconds)  //end of school
+				new Date().setHours(12, 48, bellSeconds), //end of lunch
+				new Date().setHours(13, 44, bellSeconds),  //end of sixth
+				new Date().setHours(14, 40, bellSeconds), //end of seventh
 			]
 		}
 

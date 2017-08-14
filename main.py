@@ -10,35 +10,21 @@ app.secret_key = '9625403974088191.8326510132286338'
 def update_redirect():
 	return render_template("redirect.html")
 
+@app.route('/')
+@app.route('/schedule/')
+@app.route('/schedule/<string:type>/')
+def schedule(type=None):
+	# return render_template("schedules/schedule.html", schedule_type=type)
+	return render_template("schedules/schedule.html")
+
+@app.route('/spin/')
+def spin_schedule():
+	return render_template("schedules/spin_schedule.html")
+
 @app.route('/s/', defaults={'path': ''})
 @app.route('/s/<path:path>')
 def catch_all_old_url(path):
 	return redirect("/update-redirect/", 301)
-
-@app.route('/')
-def welcome_page():
-	return render_template("welcome.html", second_offset=ndb_utils.getSecondOffset())
-
-@app.route('/schedule/')
-@app.route('/schedule/<string:type>/')
-def static_schedule(type=None):
-	if type == None:
-		flash("No schedule selected, please use one of the links.", "error")
-		return redirect("/")
-	elif type not in ["a", "b"]:
-		flash("Invald schedule selected, please use one of the links.", "error")
-		return redirect("/")
-	return render_template("schedules/static-schedule.html", schedule_type=type)
-
-@app.route('/schedule/<string:type>/spin/')
-def static_spining_schedule(type=None):
-	if type == None:
-		flash("No schedule selected, please use one of the links.", "error")
-		return redirect('/')
-	elif type not in ['a', 'b']:
-		flash("Invald schedule selected, please use one of the links.", "error")
-		return redirect('/')
-	return render_template("schedules/static_spining-schedule.html", schedule_type=type)
 
 @app.route('/api/seconds/')
 def server_second_offset():
