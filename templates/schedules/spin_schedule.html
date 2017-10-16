@@ -2,7 +2,8 @@
 <html manifest="/mobile-cache.manifest" lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Spining - Schedule</title>
+	<title>Spining Countdown</title>
+	<meta name="description" content="A simple countdown to the school bell for JHS">
 	<link type="text/css" rel="stylesheet" title="styles" href="/styles/schedules/static-schedule.css">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="Countdown">
@@ -11,7 +12,7 @@
 	<meta name="format-detection" content="telephone=no">
 	<meta name="viewport" content="width=device-width, user-scalable=no">
 	<script>document.ontouchmove = function(e) {e.preventDefault()}; /* Prevent scrolling on ios web-app*/</script>
-	<script type="text/javascript">
+	<script>
 		var bellSeconds = 0;
 		var hasRun;
 		var period;
@@ -327,7 +328,6 @@
 				currentRotationAmount += 1
 			}
 		}
-
 	</script>
 </head>
 <body onload="initialize()">
