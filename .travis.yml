@@ -10,8 +10,8 @@ deploy:
   skip_cleanup: true
   keyfile: client-secret.json
   project: bellcountdown
-  version: beta
-  no_promote: true
+  # version: beta
+  # no_promote: true
   no_stop_previous_version: true
   default: true
 
